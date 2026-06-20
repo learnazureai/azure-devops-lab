@@ -3,9 +3,11 @@ name: Terraform CI
 on:
   push:
     branches:
-      - main
-  
+      - main  
   pull_request: 
+
+permissions: 
+  contents: read
 
 jobs:
   terraform:
