@@ -2,37 +2,43 @@ name: Terraform CI
 
 on:
   push:
-    branches:
-      - main
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   terraform:
+    name: Terraform Pipeline
     runs-on: ubuntu-latest
 
     defaults:
       run:
-        working-directory: .
+        shell: bash
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
 
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
       - name: Terraform Format Check
-        run: terraform fmt -check
+        run: terraform fmt -check -recursive
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
 
       - name: Terraform Validate
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -input=false
